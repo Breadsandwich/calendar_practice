@@ -73,5 +73,5 @@ def new_appoint():
                         "private": form.private.data,
                     }
                 )
-        return redirect('/calendar/new_appointment')
-    return render_template('main.html', form=form)
+        return redirect('/calendar')
+    return render_template('new_appointment.html', form=form)
