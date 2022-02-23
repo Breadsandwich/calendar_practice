@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, render_template
+from datetime import datetime
 import os
 import psycopg2
 from calendar_app.forms import NewAppointment
@@ -43,38 +44,34 @@ def new_appoint():
     form = NewAppointment()
 
     if form.validate_on_submit():
-        name = form.data['name']
-        start_date = form.data['start date']
-        start_time = form.data['start time']
-        end_date = form.data['end date']
-        end_time = form.data['end time']
-        description = form.data['description']
-        private = form.data['private']
+        # name = form.data['name']
+        # start_date = form.data['start_date']
+        # start_time = form.data['start_time']
+        # end_date = form.data['end_date']
+        # end_time = form.data['end_time']
+        # description = form.data['description']
+        # private = form.data['private']
 
         with psycopg2.connect(**CONNECTION_PARAMETERS) as conn:
             with conn.cursor() as curs:
                 curs.execute(
                     '''
-                    INSERT INTO appointments (name, start_date, start_time, end_date, end_time, description, private)
+                    INSERT INTO appointments (name, start_datetime, end_datetime, description, private)
                     VALUES (
                         %(name)s,
-                        %(start_date)s,
-                        %(start_time)s,
-                        %(end_date)s,
-                        %(end_time)s,
+                        %(start_datetime)s,
+                        %(end_datetime)s,
                         %(description)s,
                         %(private)s
                     )
                     ''',
                     {
-                        "name": name,
-                        "start_date": start_date,
-                        "start_time": start_time,
-                        "end_date": end_date,
-                        "end_time": end_time,
-                        "description": description,
-                        "private": private,
+                        "name": form.name.data,
+                        "start_datetime": datetime.combine(form.start_date.data, form.start_time.data),
+                        "end_datetime": datetime.combine(form.end_date.data, form.end_time.data),
+                        "description": form.description.data,
+                        "private": form.private.data,
                     }
                 )
-        return redirect('/calendar')
+        return redirect('/calendar/new_appointment')
     return render_template('main.html', form=form)
